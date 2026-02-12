@@ -33,6 +33,7 @@ export default function ModalItem({
                 value={quantidade}
                 style={styles.input}
                 editable={true}
+                keyboardType="numeric"
               />
               <Button title="Fechar" style={styles.button} onPress={onClose} />
             </View>
