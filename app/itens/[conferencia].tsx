@@ -6,6 +6,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ModalItem from "./ModalItem";
 import * as NavigationBar from "expo-navigation-bar";
 import { db } from "../../services/database";
+import ItemsConferidos from "../../components/itemsConferidos";
 
 export default function ItensScreen() {
   function confirmarItem(produtoConfirmado) {
@@ -24,6 +25,7 @@ export default function ItensScreen() {
   useEffect(() => {
     NavigationBar.setVisibilityAsync("hidden");
     NavigationBar.setBehaviorAsync("immersive");
+
     async function carregarItens() {
       try {
         const data = await fetchItens(conferencia as string);
@@ -89,7 +91,7 @@ export default function ItensScreen() {
           <Text style={(styles.td, styles.th)}>QUANTIDADE</Text>
           <Text style={(styles.td, styles.th)}>AÇÃO</Text>
         </View>
-        <ScrollView style={{ width: "100%" }}>
+        <ScrollView style={{ width: "100%", marginBottom: 100 }}>
           {loading ? (
             <Text>Carregando...</Text>
           ) : itens.length > 0 ? (
@@ -111,9 +113,10 @@ export default function ItensScreen() {
               </View>
             ))
           ) : (
-            <Text></Text>
+            <Text>Sem items...</Text>
           )}
         </ScrollView>
+        <ItemsConferidos />
       </View>
     </>
   );
