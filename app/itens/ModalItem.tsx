@@ -10,6 +10,7 @@ type Props = {
   produto: string | null;
   onConfirm: (produto: string | null) => void;
   conferencia: string;
+  setArrayConferidos: Function;
 };
 export default function ModalItem({
   visible,
@@ -19,6 +20,7 @@ export default function ModalItem({
   produto,
   onConfirm,
   conferencia,
+  setArrayConferidos,
 }: props) {
   const [inputValue, setInputValue] = useState(quantidade);
   useEffect(() => {
@@ -62,6 +64,7 @@ export default function ModalItem({
                       "INSERT INTO itens (quantidade, produto, conferencia,sincronizado) VALUES (?, ?, ?, 0)",
                       [Number(inputValue), produto, conferencia]
                     );
+                    setArrayConferidos((prev) => [...prev, { produto }]);
                     if (produto) {
                       onConfirm(produto);
                     }
@@ -83,20 +86,7 @@ export default function ModalItem({
     </SafeAreaProvider>
   );
 }
-async function salvarItem(quantidade, produto, conferencia) {
-  // Lógica para salvar a quantidade do produto
-  console.log("Salvando item:", produto, "Quantidade:", quantidade);
-  try {
-    await db.runSync(
-      "INSERT INTO itens (quantidade, produto, conferencia) VALUES (?, ?, ?)",
-      [quantidade, produto, conferencia]
-    );
-    console.log("Item salvo com sucesso!");
-    itensFiltrados = itensFiltrados.filter((item) => item.cod !== produto);
-  } catch (error) {
-    console.error("Erro ao salvar item:", error);
-  }
-}
+
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,

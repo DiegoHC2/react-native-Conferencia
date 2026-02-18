@@ -6,7 +6,7 @@ import {
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { initDatabase } from "../services/database";
 import { sincronizarItens } from "../services/syncService";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -17,16 +17,17 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
+  const syncingRef = useRef(false);
+
   useEffect(() => {
-    // Inicializa banco
     initDatabase();
-
-    // Sincroniza ao abrir
-    sincronizarItens();
-
     const unsubscribe = NetInfo.addEventListener((state) => {
-      if (state.isConnected) {
-        sincronizarItens();
+      if (state.isConnected && !syncingRef.current) {
+        syncingRef.current = true;
+
+        sincronizarItens().finally(() => {
+          syncingRef.current = false;
+        });
       }
     });
 

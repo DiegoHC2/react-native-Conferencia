@@ -22,6 +22,7 @@ export default function ItensScreen() {
   const [visible, setVisible] = useState(false);
   const [quantidade, setQuantidade] = useState(null);
   const [produto, setProduto] = useState(null);
+  const [arrayConferidos, setArrayConferidos] = useState([]);
   useEffect(() => {
     NavigationBar.setVisibilityAsync("hidden");
     NavigationBar.setBehaviorAsync("immersive");
@@ -78,20 +79,14 @@ export default function ItensScreen() {
           headerTitle: `Conferência ${conferencia}`,
         }}
       />
-      <ModalItem
-        visible={visible}
-        onClose={() => setVisible(false)}
-        quantidade={quantidade}
-        produto={produto}
-        onConfirm={confirmarItem}
-      />
+
       <View style={styles.header}>
         <View style={styles.headerText}>
           <Text style={(styles.td, styles.th)}>CÓD</Text>
           <Text style={(styles.td, styles.th)}>QUANTIDADE</Text>
           <Text style={(styles.td, styles.th)}>AÇÃO</Text>
         </View>
-        <ScrollView style={{ width: "100%", marginBottom: 100 }}>
+        <ScrollView style={{ width: "100%", marginBottom: 50 }}>
           {loading ? (
             <Text>Carregando...</Text>
           ) : itens.length > 0 ? (
@@ -116,7 +111,20 @@ export default function ItensScreen() {
             <Text>Sem items...</Text>
           )}
         </ScrollView>
-        <ItemsConferidos />
+        <ModalItem
+          visible={visible}
+          onClose={() => setVisible(false)}
+          quantidade={quantidade}
+          produto={produto}
+          onConfirm={confirmarItem}
+          conferencia={conferencia as string}
+          setArrayConferidos={setArrayConferidos}
+        />
+        <ItemsConferidos
+          conferencia={conferencia as string}
+          array={arrayConferidos}
+          setArray={setArrayConferidos}
+        />
       </View>
     </>
   );
@@ -128,7 +136,11 @@ const styles = {
     color: "white",
   },
   header: {
-    alignItems: "center",
+    alignItems: "start",
+    flex: 1,
+    justifyContent: "start",
+    backgroundColor: "#F0F0F0",
+    height: "100%",
   },
   td: {
     width: "33%",

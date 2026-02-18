@@ -1,8 +1,29 @@
 import { View, Text } from "react-native";
-function ItemsConferidos() {
+import { useEffect, useState } from "react";
+import { db } from "../services/database";
+const props = {
+  conferencia: String,
+  array: Array,
+  setArray: Function,
+};
+function ItemsConferidos({ conferencia, array, setArray }: props) {
+  const conferidos = db.getAllSync(
+    "SELECT produto FROM itens where conferencia = ?",
+    [conferencia]
+  );
+  useEffect(() => {
+    setArray(conferidos);
+  }, [conferidos]);
+
   return (
-    <View style={styles.bottomView}>
-      <Text style={styles.white}>Conferidos (?)</Text>
+    <View>
+      {array.length > 0 ? (
+        <View style={styles.bottomView}>
+          <Text style={styles.white}>Conferidos ({array.length})</Text>
+        </View>
+      ) : (
+        <View></View>
+      )}
     </View>
   );
 }
