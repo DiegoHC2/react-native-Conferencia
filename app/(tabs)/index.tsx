@@ -4,6 +4,8 @@ import { Logo } from "@/components/logo";
 import { useEffect, useState } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 import { useRouter } from "expo-router";
+import NetInfo from "@react-native-community/netinfo";
+
 export default function Home() {
   useEffect(() => {
     NavigationBar.setVisibilityAsync("hidden");

@@ -5,8 +5,16 @@ import { useLocalSearchParams, Stack, useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ModalItem from "./ModalItem";
 import * as NavigationBar from "expo-navigation-bar";
+import { db } from "../../services/database";
 
 export default function ItensScreen() {
+  function confirmarItem(produtoConfirmado) {
+    // remove item do array
+    setItens((itensFiltrados) =>
+      itensFiltrados.filter((item) => item.cod !== produtoConfirmado)
+    );
+    setVisible(false);
+  }
   const { conferencia } = useLocalSearchParams();
   const [itens, setItens] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +28,15 @@ export default function ItensScreen() {
       try {
         const data = await fetchItens(conferencia as string);
         if (!data.error) {
-          setItens(data.body);
+          // preciso verificar se o item já foi conferido, para isso preciso comparar com o banco local
+          const conferidos = db.getAllSync("SELECT produto FROM itens");
+
+          const conferidosSet = new Set(conferidos.map((item) => item.produto));
+          // filter is not a function
+          const itensFiltrados = data.body.filter(
+            (item) => !conferidosSet.has(item.cod)
+          );
+          setItens(itensFiltrados);
         } else {
           if (data.error == "done") {
             ToastAndroid.showWithGravityAndOffset(
@@ -65,7 +81,7 @@ export default function ItensScreen() {
         onClose={() => setVisible(false)}
         quantidade={quantidade}
         produto={produto}
-        message="O item foi conferido com sucesso!"
+        onConfirm={confirmarItem}
       />
       <View style={styles.header}>
         <View style={styles.headerText}>
