@@ -23,6 +23,7 @@ export default function ModalItem({
   setArrayConferidos,
 }: props) {
   const [inputValue, setInputValue] = useState(quantidade);
+
   useEffect(() => {
     if (quantidade != null) {
       setInputValue(quantidade);
@@ -64,7 +65,10 @@ export default function ModalItem({
                       "INSERT INTO itens (quantidade, produto, conferencia,sincronizado) VALUES (?, ?, ?, 0)",
                       [Number(inputValue), produto, conferencia]
                     );
-                    setArrayConferidos((prev) => [...prev, { produto }]);
+                    setArrayConferidos((conferidos) => [
+                      ...conferidos,
+                      { produto, quantidade: Number(inputValue) },
+                    ]);
                     if (produto) {
                       onConfirm(produto);
                     }

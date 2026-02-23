@@ -1,4 +1,4 @@
-import { View, Text, Modal, Button } from "react-native";
+import { View, Text, Modal, Button, TextInput } from "react-native";
 import { useEffect, useState } from "react";
 import { db } from "../services/database";
 const props = {
@@ -6,15 +6,22 @@ const props = {
   array: Array,
   setArray: Function,
 };
+
 function ItemsConferidos({ conferencia, array, setArray }: props) {
-  const conferidos = db.getAllSync(
-    "SELECT produto FROM itens where conferencia = ?",
-    [conferencia]
-  );
+  const [inputEditValue, setInputEditValue] = useState("");
+  const [produtoEdit, setProdutoEdit] = useState("");
+  const [modalEditVisible, setModalEditVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [conferidos, setConferidos] = useState([]);
   useEffect(() => {
-    setArray(conferidos);
-  }, [conferidos]);
+    const data = db.getAllSync(
+      "SELECT produto, quantidade FROM itens where conferencia = ?",
+      [conferencia]
+    );
+
+    setConferidos(data);
+    setArray(data);
+  }, [conferencia]);
 
   return (
     <View style={{ backgroundColor: "black", flex: 1 }}>
@@ -35,6 +42,18 @@ function ItemsConferidos({ conferencia, array, setArray }: props) {
                       key={index}
                       title={item.produto}
                       color={"#1C314E"}
+                      onPress={() => {
+                        console.log(item);
+                        setModalEditProduto(
+                          item.produto,
+                          item.quantidade,
+                          true,
+                          setInputEditValue,
+                          setProdutoEdit,
+                          setModalEditVisible,
+                          conferidos
+                        );
+                      }}
                     />
                   </View>
                 ))}
@@ -55,10 +74,135 @@ function ItemsConferidos({ conferencia, array, setArray }: props) {
       ) : (
         <View></View>
       )}
+
+      <Modal visible={modalEditVisible} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          {/* Modal para edição do produto */}
+          <View style={styles.modalEditProduto}>
+            <Text>Editar Produto</Text>
+            <Text>Produto: {produtoEdit} </Text>
+            <Text>Quantidade: </Text>
+            <TextInput
+              value={inputEditValue}
+              onChangeText={(text) => {
+                setInputEditValue(text);
+              }}
+              style={styles.input}
+              keyboardType="numeric"
+            />
+            <Button
+              title="Editar"
+              color="darkgreen"
+              onPress={() => {
+                // Lógica para salvar as alterações do produto
+                alterarConferido(produtoEdit, inputEditValue, conferencia);
+                setModalEditProduto(
+                  "",
+                  0,
+                  false,
+                  setInputEditValue,
+                  setProdutoEdit,
+                  setModalEditVisible
+                );
+              }}
+            />
+            <Button
+              title="Excluir"
+              color="red"
+              onPress={() => {
+                try {
+                  db.runSync(
+                    "DELETE FROM itens WHERE produto = ? AND conferencia = ?",
+                    [produtoEdit, conferencia]
+                  );
+                  const updatedConferidos = conferidos.filter(
+                    (item) => item.produto !== produtoEdit
+                  );
+                  setArray(updatedConferidos);
+
+                  if (updatedConferidos.length === 0) {
+                    setModalVisible(false);
+                  }
+                } catch (error) {
+                  console.log("Erro ao excluir:", error);
+                }
+                setModalEditProduto(
+                  "",
+                  0,
+                  false,
+                  setInputEditValue,
+                  setProdutoEdit,
+                  setModalEditVisible
+                );
+              }}
+            />
+            <Button
+              title="Fechar"
+              color="grey"
+              onPress={() =>
+                setModalEditProduto(
+                  "",
+                  0,
+                  false,
+                  setInputEditValue,
+                  setProdutoEdit,
+                  setModalEditVisible
+                )
+              }
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
+function alterarConferido(
+  produto: string,
+  quantidade: string,
+  conferencia: string,
+  conferidos?: any[]
+) {
+  try {
+    db.runSync(
+      "UPDATE itens SET quantidade = ? WHERE produto = ? AND conferencia = ?",
+      [Number(quantidade), produto, conferencia]
+    );
+    conferidos.map((item) => {
+      if (item.produto === produto) {
+        item.quantidade = Number(quantidade);
+      }
+    });
+  } catch (error) {
+    console.log("Erro ao alterar:", error);
+  }
+}
+function setModalEditProduto(
+  produto: string,
+  quantidade: any,
+  visible: boolean,
+  setInputEditValue: Function,
+  setProdutoEdit: Function,
+  setModalEditVisible: Function
+) {
+  // Lógica para abrir o modal de edição do produto
+
+  setInputEditValue(String(quantidade));
+  setProdutoEdit(produto);
+  setModalEditVisible(visible);
+}
 const styles = {
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 10,
+  },
+  modalEditProduto: {
+    flex: 1,
+    gap: 20,
+    justifyContent: "start",
+    alignItems: "start",
+  },
   item: {
     fontSize: 16,
     marginBottom: 10,

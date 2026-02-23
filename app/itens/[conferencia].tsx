@@ -164,11 +164,13 @@ const styles = {
   },
 };
 async function fetchItens(conferencia: string) {
+  console.log("teste");
+
   const response = await fetch(
     `http://192.168.2.78:8080/backend/conferencia/informacoesDaLista.php?id=${conferencia}`
   );
-
   if (!response.ok) {
+    console.log("error");
     throw new Error("Erro na requisição");
   }
 
