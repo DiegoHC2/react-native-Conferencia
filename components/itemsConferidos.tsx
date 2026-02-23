@@ -179,15 +179,16 @@ function alterarConferido(
 ) {
   try {
     db.runSync(
-      "UPDATE itens SET quantidade = ? WHERE produto = ? AND conferencia = ?",
-      [Number(quantidade), produto, conferencia]
+      "UPDATE itens SET quantidade = ?, sincronizado = ? WHERE produto = ? AND conferencia = ?",
+      [Number(quantidade), 0, produto, conferencia]
     );
 
     conferidos.map((item) => {
       if (item.produto === produto) {
-        item.quantidade = Number(quantidade);
+        item.quantidade = String(quantidade);
       }
     });
+    console.log("Work  ?");
   } catch (error) {
     console.log("Erro ao alterar:", error);
   }
