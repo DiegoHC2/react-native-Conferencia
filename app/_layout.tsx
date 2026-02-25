@@ -11,14 +11,14 @@ import { initDatabase } from "../services/database";
 import { sincronizarItens } from "../services/syncService";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import NetInfo from "@react-native-community/netinfo";
-
+import { useSyncInterval } from "@/hooks/useSyncInterval";
 export const unstable_settings = {
   anchor: "(tabs)",
 };
 
 export default function RootLayout() {
   const syncingRef = useRef(false);
-
+  useSyncInterval(sincronizarItens, 5000);
   useEffect(() => {
     initDatabase();
     const unsubscribe = NetInfo.addEventListener((state) => {

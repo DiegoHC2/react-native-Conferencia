@@ -1,4 +1,4 @@
-import { View, Text, Modal, Button, TextInput } from "react-native";
+import { View, Text, Modal, Button, TextInput, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import { db } from "../services/database";
 const props = {
@@ -35,29 +35,36 @@ function ItemsConferidos({ conferencia, array, setArray }: props) {
           <View style={styles.modalContent}>
             <View>
               <Text style={styles.modalTitle}>Itens Conferidos</Text>
-              <View style={styles.modalView}>
-                {array.map((item, index) => (
-                  <View style={{ width: "45%" }} key={index}>
-                    <Button
-                      key={index}
-                      title={item.produto}
-                      color={"#1C314E"}
-                      onPress={() => {
-                        console.log(item);
-                        setModalEditProduto(
-                          item.produto,
-                          item.quantidade,
-                          true,
-                          setInputEditValue,
-                          setProdutoEdit,
-                          setModalEditVisible,
-                          conferidos
-                        );
-                      }}
-                    />
-                  </View>
-                ))}
-              </View>
+              <ScrollView
+                contentContainerStyle={{
+                  gap: 10,
+                  paddingBottom: 50,
+                }}
+              >
+                <View style={styles.modalView}>
+                  {array.map((item, index) => (
+                    <View style={{ width: "45%" }} key={index}>
+                      <Button
+                        key={index}
+                        title={item.produto}
+                        color={"#1C314E"}
+                        onPress={() => {
+                          console.log(item);
+                          setModalEditProduto(
+                            item.produto,
+                            item.quantidade,
+                            true,
+                            setInputEditValue,
+                            setProdutoEdit,
+                            setModalEditVisible,
+                            conferidos
+                          );
+                        }}
+                      />
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
             </View>
             <View>
               <Button title="Fechar" onPress={() => setModalVisible(false)} />
